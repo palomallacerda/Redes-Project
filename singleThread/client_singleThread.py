@@ -1,6 +1,6 @@
 from socket import *
 
-serverName = ''
+serverName = 'localhost'
 serverPort = 12000
 
 #Criando o socket TCP com conexão a internet

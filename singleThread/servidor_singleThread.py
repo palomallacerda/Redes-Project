@@ -1,7 +1,7 @@
 from socket import * #importando todos os metódos dessa biblioteca
 
 serverport = 12000 ## porta do serviço que será usada
-serverName = ''
+serverName = 'localhost'
 #metodo socket recebe dois parametros o tipo de socket (no caso da internet, serviço que ele ta 
 # operando ou seja TCP)
 serverSocket = socket(AF_INET, SOCK_STREAM)
@@ -17,6 +17,8 @@ while 1:
     # metodo accept cria conecction socket o endereço de memoria do qual a conexão foi estabelecida, ou seja,
     # qual socket do cliente#
     # addr é o endereço ip e a porta de destino
+    i = 0
+    print('Waiting to receive a client message....')
     connectionSocket, addr = serverSocket.accept()
     #recebe até 1024 caracteres
     sentence = connectionSocket.recv(1024)
@@ -28,5 +30,7 @@ while 1:
     connectionSocket.send(capitalizedSentence.encode('utf-8'))
     #encerra conexão
     connectionSocket.close()
+    if i < 1:
+        break
 
 
