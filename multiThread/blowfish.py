@@ -1,6 +1,6 @@
 #Sistema de encriptografia usando o método Blowfish
 
-from os import access, pipe, system
+from os import access, pipe, sendfile, system
 from Crypto.Cipher import Blowfish
 from Crypto import Random
 import base64
@@ -25,36 +25,43 @@ def Densencrypt(key, Ecp_msg):
     final = Blowfish.new(key,Blowfish.MODE_CBC,iv)
     return final.decrypt(Encrypted_msg).decode('ascii').rstrip('*')
 
-def menu():
-    while True:
-        print(" ╔╦╦╦═╦╗╔═╦═╦══╦═╗╔══╦═╗╔═╦╗╔═╦╦╦╦═╦╦══╦╦╗")
-        print(" ║║║║╦╣╚╣╠╣║║║║║╦╣╚╗╔╣║║║╣╣╚╣║║║║║╔╣╠╗╚╣═║")       
-        print(" ╚══╩═╩═╩═╩═╩╩╩╩═╝.╚╝╚═╝╚═╩═╩═╩══╩╝╚╩══╩╩╝")        
-        print('                              your encryptation program\n\nPlease enter your operation')
-        print('1-Encrypt\n3-Exit\n')
-        action = input('')
-        msg = ''
-        Final = ''
+
+def menu( action, msg, Final):
+    print(" ╔╦╦╦═╦╗╔═╦═╦══╦═╗╔══╦═╗╔═╦╗╔═╦╦╦╦═╦╦══╦╦╗")
+    print(" ║║║║╦╣╚╣╠╣║║║║║╦╣╚╗╔╣║║║╣╣╚╣║║║║║╔╣╠╗╚╣═║")       
+    print(" ╚══╩═╩═╩═╩═╩╩╩╩═╝.╚╝╚═╝╚═╩═╩═╩══╩╝╚╩══╩╩╝")        
+    print('                              your encryptation program\n\nPlease enter your operation')
+    print('1-Encrypt\n2-Decode\n3-Exit\n')
+    action = input('')
+    if(action!=3):       
         if action == '1':
             print('\nPlease enter your message')
             msg = input('')
             Final = Encrypt(msg)
+            print("\nYour Generaded key is:")
+            print(Final[0]) 
             print("\nYour encrypted message is:")
             print(Final[1])
+        elif action == '2':
+            if Final != '':
+                print("\nYour decoded message:")
+                fim = Densencrypt(Final[0], Final[1])
+                print(fim)
+                print("\n")
+                print("Rebooting Systeam......")
+                Final = ''
+            else:
+                print("WRONG!\nPlease don't forget to enter your message!")
         elif action == '3':
-            break    
-        else:  # Arrumar uma forma de fazer o loop
-            print("Unexpected input reloading systeam.....\n")
-            menu()
+            return
+        else:
+            print('Unexpected number, try again!')
+        menu(action, msg, Final)
 
-        print("\nDo you want to:\n2-Decode\n3-exit\n")
-        action = input('')
+def main():        
+    action = ''
+    msg = ''
+    Final = ''
+    menu(action, msg, Final)
 
-        if action == '2':
-            print("\nYour decoded message:")
-            fim = Densencrypt(Final[0], Final[1])
-            print(fim)
-        if action == '3':
-            break
-
-menu()
+main()
