@@ -55,6 +55,7 @@ def menu(action, msg, Final):
             console.print("WRONG!\nPlease don't forget to enter your message!", style='bold red')
             time.sleep(1)
     elif action == '3':
+        console.print("[b]Leaving system...[/b]")
         return
     else:
         console.print('Unexpected number, try again!', style='bold red')
