@@ -13,23 +13,23 @@ def menu(action, msg, Final,key):
         console.print('                              [i]your encryptation program[/i]\n\n[b]Make a wish[b]')
         console.print('[1] Encrypt\n[2] Decode\n[3] E X I T\n')
         action = input('> ')
-        print(action)
+        sck.send(action.encode('utf-8'))
         if(action!=3):       
             if action == '1':
                 console.print('\nGive me a message', style='bold red')
                 msg = input('>> ')
                 sck.sendall(msg.encode('utf-8')) #manda mensagem para o servidor  
-                console.print('\nGive me a key with minimum 6 caracters', style='bold red')
+                console.print('\nGive me a key with minimum 4 caracters', style='bold red')
                 key = input('>> ')
                 sck.sendall(key.encode('utf-8')) #manda mensagem para o servidor  
-                Final = sck.recv(1024)
+                Final = sck.recv(1024) #recebe mensagem encriptada
                 console.print("\nENCRYPTED MESSAGE", style='bold yellow')
                 print(Final.decode())
-                time.sleep(1)
+                time.sleep(0.5)
                 console.print("\nPLEASE WAIT\nRESTARTING SYSTEM....", style='bold yellow')
                 time.sleep(2)
             elif action == '2':
-                if Final == '': # vai inserir uma mensagem pra decodificar
+                if Final == '': # vai inserir uma mensagem pra decodificar//AINDA N TA FUNCIONANDO
                     console.print('\nGive me a encrypted message', style='bold red')
                     if msg == '':
                         msg = input('>> ')
@@ -40,17 +40,17 @@ def menu(action, msg, Final,key):
                         time.sleep(2)
                         console.print("\nDECODED MESSAGE", style='bold yellow')
                         print(Descrypt)
-                else: # vai decodificar a mensagem inserida anteriormente
-                    Descrypt = blowfish.decrypt_message(key, msg)  
-                    console.print("\nPLEASE WAIT\nDESCODING MESSAGE....", style='bold yellow')
-                    print(msg)
+                else: # vai decodificar a mensagem que já foi inserida anteriormente
+                    console.print("\nPLEASE WAIT\nDESCODING MESSAGE....", style='bold yellow')#colocar uns movimentos 
                     time.sleep(2)
                     console.print("\nDECODED MESSAGE", style='bold yellow')
-                    print(Descrypt)
+                    Descrypt_msg = sck.recv(1024)
+                    print(Descrypt_msg.decode())
                     time.sleep(1)                                    
-            else:
-                print("Shutting down System!")
-                return 1
+        if action == '3': 
+            console.print("Shutting down System.....", style='bold yellow')
+            time.sleep(0.5)
+            return True
         menu(action, msg, Final, key)
 
 #vc pode mudar o host e a porta de entrada
@@ -72,7 +72,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sck:
         Final = ''
         key = ''
         shut = menu(action, msg, Final,key)
-        if shut == 1 : break
-        # sck.sendall(sentence.encode('utf-8')) #manda mensagem para o servidor 
-        # # result = sck.recv(1024)
-        # print(f"Your response from Server is: {result}")
+        if shut == True: break
