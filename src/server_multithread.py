@@ -45,6 +45,7 @@ while True:
 		threading._start_new_thread(on_new_client,(client, ip))
 	except KeyboardInterrupt:
 		print('We are shutting down the server!')
+		break
 	except Exception as e:
 		print(f"Something went wrong: {e}")
 sck.close()
