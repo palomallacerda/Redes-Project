@@ -1,6 +1,6 @@
 import socket
 import argparse
-import threading 
+import threading
 
 parser = argparse.ArgumentParser(description = "This is the server for the multithreaded socket demo!")
 parser.add_argument('--host', metavar = 'host', type = str, nargs = '?', default = socket.gethostname())
@@ -12,7 +12,7 @@ print(f"Running the server on: {args.host} and port: {args.port}")
 sck = socket.socket()
 sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-try: 
+try:
 	sck.bind((args.host, args.port))
 	sck.listen(5)
 except Exception as e:
@@ -40,7 +40,7 @@ def on_new_client(client, connection):
 	client.close()
 
 while True:
-	try: 
+	try:
 		client, ip = sck.accept()
 		threading._start_new_thread(on_new_client,(client, ip))
 	except KeyboardInterrupt:

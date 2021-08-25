@@ -1,5 +1,5 @@
 import socket
-import argparse 
+import argparse
 
 #vc pode mudar o host e a porta de entrada
 parser = argparse.ArgumentParser(description="This is a client for multthreads connections")
@@ -14,11 +14,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sck:
         sck.connect((arg.host, arg.port))
     except Exception as e: #caso apareça algum erro
         raise SystemExit(f"We cant connect to {arg.host} on {arg.port} because: {e}")
-    
+
     while True:
-        print('Please enter your message') 
+        print('Please enter your message')
         sentence = input("")
-        sck.sendall(sentence.encode('utf-8')) #manda mensagem para o servidor 
+        sck.sendall(sentence.encode('utf-8')) #manda mensagem para o servidor
         if sentence == 'exit': #palavra chave de saida do loop
             print('Client is desconnecting....')
             break
