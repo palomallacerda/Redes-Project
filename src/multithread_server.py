@@ -1,12 +1,8 @@
-import base64
 import socket
 import argparse
 import threading
-import base64
-from typing import Final
 import blowfish
 
-# blowfish decodificar
 parser = argparse.ArgumentParser(description = "This is the server for the multithreaded socket demo!")
 parser.add_argument('--host', metavar = 'host', type = str, nargs = '?', default = socket.gethostname())
 parser.add_argument('--port', metavar = 'port', type = int, nargs = '?', default = 14000)
@@ -39,12 +35,14 @@ def on_new_client(client, connection, client_message, key, encrypted_message):
 			print(f"We are sending the encrypted message: {encrypted_message[1].decode()}")
 			print(f"We are sending the encrypted key: {encrypted_message[0]}")
 			client.sendall(encrypted_message[1])
+
 		if action == '2': #arrumar uma forma de reconhecer quando for decodificar uma mensagem já inserida ou n
 			print(f"Decoding the client message: {client_message}\n with key:{key}\n")
 			encrypted_message = blowfish.encrypt_message(client_message, key)
 			return_message = blowfish.decrypt_message(encrypted_message[0],encrypted_message[1])
 			print(f"Sending decoded message:{return_message}")
 			client.sendall(return_message.encode())
+
 		if action == '3':
 			break
 		on_new_client(client, connection, client_message, key, encrypted_message)
