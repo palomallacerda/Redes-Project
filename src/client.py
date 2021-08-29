@@ -1,6 +1,5 @@
 import socket
 import argparse
-import blowfish
 from rich.console import Console
 from rich.progress import Progress
 import time
@@ -37,42 +36,37 @@ def menu(action, user_message, return_message, key):
             time.sleep(2)
 
         elif action == '2':
-            if return_message == '':
-                console.print('\nGive me a encrypted message', style='bold red')
-                if user_message == '':
-                    user_message = input('>> ')
-                    console.print('\nGive me a key with minimum 6 caracters', style='bold red')
-                    key = input('>> ')
-                    decrypted_message = True
-                    with Progress() as progress:
-                        taks_1 = progress.add_task("[yellow]Processing....", total=100)
-                        time.sleep(0.3)
-                        while not progress.finished:
-                            progress.update(taks_1, advance=40)
-                            time.sleep(1)
-
-                    decrypted_message = blowfish.decrypt_message(key.encode(), user_message)
-                    if decrypted_message == False:
-                        console.print("\nINVALID MESSAGE, TRY AGAIN....\n", style='bold yellow')
-                        time.sleep(0.2)
-                    else:
-                        console.print("\nPLEASE WAIT\nRESTARTING SYSTEM....", style='bold yellow')
-                        time.sleep(3)
-                        console.print("\nDECODED MESSAGE", style='bold yellow')
-                        print(decrypted_message)
-            else:
-                console.print("\nPLEASE WAIT\nDECODING PREVIOUS MESSAGE...", style='bold yellow')#colocar uns movimentos
-                time.sleep(2)
+            console.print('\nGive me a encrypted message', style='bold red')
+            user_encrypted_message = input('>> ')
+            if user_encrypted_message != '':
+                sck.sendall(user_encrypted_message.encode('utf-8'))
+                console.print('\nGive me a key with minimum 6 caracters', style='bold red')
+                key = input('>> ')
+                sck.sendall(key.encode('utf-8'))
+                return_decrypted_message = sck.recv(1024)
                 with Progress() as progress:
-                        taks_1 = progress.add_task("[yellow]Processing....", total=100)
-                        time.sleep(0.3)
-                        while not progress.finished:
-                            progress.update(taks_1, advance=40)
-                            time.sleep(1)
-                console.print("\nDECODED MESSAGE", style='bold yellow')
-                decrypt_user_message = sck.recv(1024)
-                print(decrypt_user_message.decode())
-                time.sleep(1)
+                    taks_1 = progress.add_task("[yellow]Processing....", total=100)
+                    time.sleep(0.3)
+                    while not progress.finished:
+                        progress.update(taks_1, advance=40)
+                        time.sleep(1)
+                console.print("\nENCRYPTED MESSAGE", style='bold yellow')
+                print(return_decrypted_message.decode())
+                time.sleep(0.5)
+                console.print("\nRESTARTING SYSTEM....", style='bold yellow')
+                time.sleep(2)
+                    # decrypted_message = blowfish.decrypt_message(key.encode(), user_message)
+                    # if decrypted_message == False:
+                    #     console.print("\nINVALID MESSAGE, TRY AGAIN....\n", style='bold yellow')
+                    #     time.sleep(0.2)
+                    # else:
+                    #     console.print("\nDECODED MESSAGE", style='bold yellow')
+                    #     print(decrypted_message)
+                    #     console.print("\nPLEASE WAIT\nRESTARTING SYSTEM....", style='bold yellow')
+                    #     time.sleep(3)
+            else:
+                console.print("\nNO MESSAGE GIVEN...", style='bold red')#colocar uns movimentos
+                time.sleep(2)
 
         if action == '3':
             console.print("Shutting down server...", style='bold yellow')

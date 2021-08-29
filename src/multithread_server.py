@@ -19,7 +19,6 @@ try:
 except Exception as e:
 	raise SystemExit(f"We could not bind the server on host: {args.host} to port: {args.port}, because: {e}")
 
-
 def on_new_client(client, connection, client_message, key, encrypted_message):
 	ip = connection[0]
 	port = connection[1]
@@ -35,17 +34,18 @@ def on_new_client(client, connection, client_message, key, encrypted_message):
 			print(f"We are sending the encrypted message: {encrypted_message[1].decode()}")
 			print(f"We are sending the encrypted key: {encrypted_message[0]}")
 			client.sendall(encrypted_message[1])
-
-		if action == '2': #arrumar uma forma de reconhecer quando for decodificar uma mensagem já inserida ou n
-			print(f"Decoding the client message: {client_message}\n with key:{key}\n")
-			encrypted_message = blowfish.encrypt_message(client_message, key)
-			return_message = blowfish.decrypt_message(encrypted_message[0],encrypted_message[1])
-			print(f"Sending decoded message:{return_message}")
-			client.sendall(return_message.encode())
+			sck.close()
+		if action == '2':
+			client_encrypted_message = client.recv(1024).decode()
+			key = client.recv(1024)
+			print(f"Decoding the client message: {client_encrypted_message}\n with key:{key}\n")
+			return_decrypted_message = blowfish.decrypt_message(key, client_encrypted_message)
+			print(f"Sending decoded message:{return_decrypted_message}")
+			client.sendall(return_decrypted_message.encode())
 
 		if action == '3':
-			break
-		on_new_client(client, connection, client_message, key, encrypted_message)
+			return
+		# on_new_client(client, connection, client_message, key, encrypted_message)
 
 while True:
 	try:
