@@ -1,8 +1,6 @@
 import socket
 import argparse
-
-from rich import progress
-import blowfish
+from rich import progress, text
 from rich.console import Console
 from rich.progress import Progress
 import time
@@ -37,47 +35,39 @@ def menu(action, user_message, return_message, key):
             console.print("\nRESTARTING SYSTEM....", style='bold yellow')
             time.sleep(2)
         elif action == '2':
-            if return_message == '': # vai inserir uma mensagem pra decodificar//AINDA N TA FUNCIONANDO
                 console.print('\nGive me a encrypted message', style='bold red')
-                if user_message == '':
-                    user_message = input('>> ')
-                    console.print('\nGive me a key with minimum 6 caracters', style='bold red')
-                    key = input('>> ')
-                    decrypted_message = True  
-                    with Progress() as progress:
-                        taks_1 = progress.add_task("[yellow]Processing....", total=100)
-                        time.sleep(0.3)
-                        while not progress.finished:
-                            progress.update(taks_1, advance=40)
-                            time.sleep(1)
-
-                    decrypted_message = blowfish.decrypt_message(key.encode(), user_message)
-                    if decrypted_message == False: #Mensagem colocada não é válida
-                        console.print("\nINVALID MESSAGE, TRY AGAIN....\n", style='bold yellow')
-                        time.sleep(0.2)
-                    else:
-                        console.print("\nPLEASE WAIT\nRESTARTING SYSTEM....", style='bold yellow')
-                       
-                        time.sleep(3)
-                        console.print("\nDECODED MESSAGE", style='bold yellow')
-                        print(decrypted_message)
-            else: # vai decodificar a mensagem que já foi inserida anteriormente
-                console.print("\nPLEASE WAIT\nDECODING PREVIOUS MESSAGE...", style='bold yellow')#colocar uns movimentos
-                time.sleep(2)
+                user_message = input('>> ')
+                sck.sendall(user_message.encode('utf-8'))
+                console.print('\nGive me a key with minimum 4 caracters', style='bold red')
+                key = input('>> ')
+                sck.sendall(key.encode('utf-8'))
+                decrypted_message = sck.recv(1024)
+                decrypted_message = decrypted_message.decode()
                 with Progress() as progress:
-                        taks_1 = progress.add_task("[yellow]Processing....", total=100)
-                        time.sleep(0.3)
-                        while not progress.finished:
-                            progress.update(taks_1, advance=40)
-                            time.sleep(1)
-                console.print("\nDECODED MESSAGE", style='bold yellow')
-                decrypt_user_message = sck.recv(1024)
-                print(decrypt_user_message.decode())
-                time.sleep(1)
-        if action == '3':
+                    taks_1 = progress.add_task("[yellow]Processing....", total=100)
+                    time.sleep(0.3)
+                    while not progress.finished:
+                        progress.update(taks_1, advance=40)
+                        time.sleep(1)
+                if decrypted_message == ' ': #Mensagem colocada não é válida
+                    console.print("\nERROR\n", style='bold yellow')
+                    time.sleep(0.5)
+                    console.print("\nFollow these steps:\n", style='Green')
+                    console.print("\n--> Verify if you have the correct Key\n", style='Green')
+                    console.print("\n--> Verify if your message is encryped corretly\n", style='Green')
+                    time.sleep(1)
+                    console.print("NOW, TRY AGAIN....", style='bold yellow')
+                else: # Mensagem é valida
+                    console.print("\nDECODED MESSAGE", style='bold yellow')
+                    time.sleep(0.7)
+                    print(decrypted_message)
+        elif action == '3':
             console.print("Shutting down server...", style='bold yellow')
             time.sleep(0.5)
-            return True
+            return 
+        else:  
+            console.print("Wrong input try again", style='bold yellow')
+            time.sleep(0.5)
         menu(action, user_message, return_message, key)
 
 #vc pode mudar o host e a porta de entrada
@@ -92,11 +82,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sck:
         sck.connect((arg.host, arg.port))
     except Exception as e: #caso apareça algum erro
         raise SystemExit(f"We cant connect to {arg.host} on {arg.port} because: {e}")
-
     while True:
         action = ''
         user_message = ''
         return_message = ''
         key = ''
         shut = menu(action, user_message, return_message,key)
-        if shut == True: break
+        break
