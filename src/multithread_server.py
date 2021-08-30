@@ -24,7 +24,6 @@ try:
 except Exception as e:
 	raise SystemExit(f"We could not bind the server on host: {args.host} to port: {args.port}, because: {e}")
 
-
 def on_new_client(i, client, connection, client_message, key, encrypted_message):
 	ip = connection[0]
 	port = connection[1]
