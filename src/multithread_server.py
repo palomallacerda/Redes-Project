@@ -5,6 +5,7 @@ import threading
 import base64
 from typing import Final
 import blowfish
+import time
 
 # blowfish decodificar
 parser = argparse.ArgumentParser(description = "This is the server for the multithreaded socket demo!")
@@ -24,10 +25,11 @@ except Exception as e:
 	raise SystemExit(f"We could not bind the server on host: {args.host} to port: {args.port}, because: {e}")
 
 
-def on_new_client(client, connection, client_message, key, encrypted_message):
+def on_new_client(i, client, connection, client_message, key, encrypted_message):
 	ip = connection[0]
 	port = connection[1]
-	print(f"A new connection was made from IP: {ip}, and port: {port}!\n Waiting for a message....")
+	if i == 1:
+		print(f"A new connection was made from IP: {ip}, and port: {port}!\n") 
 	action = client.recv(1024).decode('utf-8')
 
 	while True:
@@ -37,17 +39,23 @@ def on_new_client(client, connection, client_message, key, encrypted_message):
 			print(f"The client message is: {client_message}\n and key:{key}\n")
 			encrypted_message = blowfish.encrypt_message(client_message, key)
 			print(f"We are sending the encrypted message: {encrypted_message[1].decode()}")
-			print(f"We are sending the encrypted key: {encrypted_message[0]}")
+			print(f"With key: {encrypted_message[0].decode()}")
 			client.sendall(encrypted_message[1])
-		if action == '2': #arrumar uma forma de reconhecer quando for decodificar uma mensagem já inserida ou n
-			print(f"Decoding the client message: {client_message}\n with key:{key}\n")
-			encrypted_message = blowfish.encrypt_message(client_message, key)
-			return_message = blowfish.decrypt_message(encrypted_message[0],encrypted_message[1])
-			print(f"Sending decoded message:{return_message}")
-			client.sendall(return_message.encode())
+		if action == '2': 
+			msg_enc = client.recv(1024)
+			key_enc = client.recv(1024)
+			print(f"Decoding the client message: {msg_enc.decode()}\n with key:{key_enc}\n")
+			try:
+				return_message = blowfish.decrypt_message(key_enc, msg_enc.decode())
+				print(f"Sending decoded message:{return_message}")
+				client.sendall(return_message.encode())
+			except Exception as e:
+				print(f"We couldn't decode {msg_enc.decode()}, because: {e}")
+				client.sendall(' '.encode())
 		if action == '3':
+			print(f"Client {ip} on port: {port} is saying good-bye")
 			break
-		on_new_client(client, connection, client_message, key, encrypted_message)
+		on_new_client(0, client, connection, '', '', encrypted_message)
 
 while True:
 	try:
@@ -55,10 +63,11 @@ while True:
 		encrypted_message = ''
 		client_message =''
 		key = ''
-		threading._start_new_thread(on_new_client,(client, ip,client_message, key, encrypted_message))
+		threading._start_new_thread(on_new_client,(1, client, ip,client_message, key, encrypted_message))
 	except KeyboardInterrupt:
-		print('We are shutting down the server!')
+		print('\nWe are shutting down the server!')
 		break
 	except Exception as e:
 		print(f"Something went wrong: {e}")
+		break
 sck.close()
