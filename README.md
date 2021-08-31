@@ -9,16 +9,20 @@ A system capable of encrypting and decrypting a message using concepts such as s
 
 ## How to run
 1. Install the dependencies used in this project, by running the following command in your terminal:
-
+```
     pip install -r requirements.txt
+```
 
 2. As it was built TCP-based, you need to enable the server before making new connections.
 
+```
     python3 src/multithread_server.py
+```
 
 3. Now is up to the client (or clients), open a new terminal and have fun!
-
+```
     python3 src/client.py
+```
 
 ```
     ╔╦╦╦═╦╗╔═╦═╦══╦═╗╔══╦═╗╔═╦╗╔═╦╦╦╦═╦╦══╦╦╗
