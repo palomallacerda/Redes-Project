@@ -1,6 +1,5 @@
 import socket
 import argparse
-from rich import progress, text
 from rich.console import Console
 from rich.progress import Progress
 import time
@@ -15,14 +14,15 @@ def menu(action, user_message, return_message, key):
         console.print('[1] Encrypt\n[2] Decode\n[3] E X I T\n')
         action = input('> ')
         sck.send(action.encode('utf-8'))
+
         if action == '1':
             console.print('\nGive me a message', style='bold red')
             user_message = input('>> ')
-            sck.sendall(user_message.encode('utf-8')) #manda mensagem para o servidor
+            sck.sendall(user_message.encode('utf-8'))
             console.print('\nGive me a key with minimum 4 caracters', style='bold red')
             key = input('>> ')
-            sck.sendall(key.encode('utf-8')) #manda mensagem para o servidor
-            return_message = sck.recv(1024) #recebe mensagem encriptada
+            sck.sendall(key.encode('utf-8'))
+            return_message = sck.recv(1024)
             with Progress() as progress:
                         taks_1 = progress.add_task("[yellow]Processing....", total=100)
                         time.sleep(0.3)
@@ -34,6 +34,7 @@ def menu(action, user_message, return_message, key):
             time.sleep(0.5)
             console.print("\nRESTARTING SYSTEM....", style='bold yellow')
             time.sleep(2)
+
         elif action == '2':
                 console.print('\nGive me a encrypted message', style='bold red')
                 user_message = input('>> ')
@@ -49,38 +50,42 @@ def menu(action, user_message, return_message, key):
                     while not progress.finished:
                         progress.update(taks_1, advance=40)
                         time.sleep(1)
-                if decrypted_message == ' ': #Mensagem colocada não é válida
+                if decrypted_message == ' ':
                     console.print("\nERROR\n", style='bold yellow')
                     time.sleep(0.5)
                     console.print("\nFollow these steps:\n", style='Green')
-                    console.print("\n--> Verify if you have the correct Key\n", style='Green')
-                    console.print("\n--> Verify if your message is encryped corretly\n", style='Green')
+                    console.print("\n--> Verify if the typed key matches the true decoder key\n", style='Green')
+                    console.print("\n--> Verify if your message is corretly encrypted or mistyped\n", style='Green')
                     time.sleep(1)
                     console.print("NOW, TRY AGAIN....", style='bold yellow')
-                else: # Mensagem é valida
+                else:
                     console.print("\nDECODED MESSAGE", style='bold yellow')
                     time.sleep(0.7)
                     print(decrypted_message)
+                    time.sleep(0.5)
+                    console.print("\nRESTARTING SYSTEM....", style='bold yellow')
+                    time.sleep(2)
+
         elif action == '3':
             console.print("Shutting down server...", style='bold yellow')
             time.sleep(0.5)
-            return 
-        else:  
+            return
+
+        else:
             console.print("Wrong input try again", style='bold yellow')
             time.sleep(0.5)
         menu(action, user_message, return_message, key)
 
-#vc pode mudar o host e a porta de entrada
 parser = argparse.ArgumentParser(description="This is a client for multthreads connections")
 parser.add_argument('--host', metavar= 'host', type= str, nargs='?', default= socket.gethostname())
 parser.add_argument('--port', metavar= 'port', type= int, nargs='?', default= 14000)
 arg = parser.parse_args()
 print(f"Connecting to server: {arg.host} on port {arg.port}")
-#criando socket TCP
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sck:
     try:
         sck.connect((arg.host, arg.port))
-    except Exception as e: #caso apareça algum erro
+    except Exception as e:
         raise SystemExit(f"We cant connect to {arg.host} on {arg.port} because: {e}")
     while True:
         action = ''

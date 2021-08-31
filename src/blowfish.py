@@ -1,31 +1,28 @@
 # Blowfish based encryptography system
-
-from os import access, pipe, sendfile, system
 from Crypto.Cipher import Blowfish
 from Crypto import Random
 from rich.console import Console
-import time
 import base64
 
 console = Console()
 
-def IsBase64(str):#verifica se a mensagem a ser codificada ta na base certa
+def IsBase64(str):
     try:
         base64.b64decode(str)
         return True
     except Exception as e:
         return False
 
-def encrypt_message(msg, key): #função para encriptar
+def encrypt_message(msg, key):
     block_size = Blowfish.block_size
     iv = Random.new().read(Blowfish.block_size)
     padding = "*"
     def p(s): return s+(block_size - len(s) % block_size)*padding
     c = Blowfish.new(key, Blowfish.MODE_CBC, iv)
-    Ecp_msg = iv + c.encrypt(p(msg).encode('utf-8'))    
+    Ecp_msg = iv + c.encrypt(p(msg).encode('utf-8'))
     return [key, base64.b64encode(Ecp_msg)]
 
-def decrypt_message(key, Ecp_msg):#função para decodificar
+def decrypt_message(key, Ecp_msg):
     if IsBase64(Ecp_msg):
         block_size = Blowfish.block_size
         Encrypted_msg = base64.b64decode(Ecp_msg)[block_size:]
@@ -34,5 +31,5 @@ def decrypt_message(key, Ecp_msg):#função para decodificar
         return final.decrypt(Encrypted_msg).decode('ascii').rstrip('*')
     else:
         return False
-    
+
 
