@@ -10,7 +10,7 @@ commonmark==0.9.1
     # via rich
 pycryptodome==3.10.1
     # via -r requirements.in
-pygments==2.10.0
+pygments==2.15.0
     # via rich
 rich==10.7.0
     # via -r requirements.in
